@@ -6,12 +6,12 @@ import { TaskDTO} from './dto/TaskDTO';
 export class TodoController {
   constructor(private readonly todoService: TodoService) {}
 
-  @Post()
+  @Post() // Obs: ao criar uma tarefa deve-se passar a id de uma categoria ja existente
   async create(@Body() data: TaskDTO) {
     return this.todoService.create(data);
   }
 
-  @Get()
+  @Get()  //Sem problemas 
   async findAll(){
     return this.todoService.findAll();
   }
@@ -20,6 +20,8 @@ export class TodoController {
   async update(@Param('id') id: string, data: TaskDTO){
     return this.todoService.update(id,data);
   }
+
+  
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
@@ -31,8 +33,24 @@ export class TodoController {
     return this.todoService.remove(id);
   }
 
-  @Get(':done')
+  @Delete(':done')
+  async deleteDone(){
+    return this.todoService.deleteDone();
+  }
+
+  @Delete('limpartudo')
+  async deleteAllTasks() {
+    await this.todoService.deleteAllTasks();
+    return { message: 'Todas as tarefas foram deletadas com sucesso.' };
+  }
+
+  @Get('feito')
   async filterByDone(@Param('done') done: boolean) {
-    return this.todoService.filterByDone(done);
+    const tasks =  this.todoService.filterByDone(done);
+    return tasks
+  }
+  @Get(':category')
+  async filterbyCategory(@Param('category') category:number){
+    return this.todoService.filterbyCategory(category)
   }
 }

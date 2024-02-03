@@ -16,7 +16,7 @@ model Task {
   priority     Boolean   @default(false)
   created_at   DateTime  @default(now())
   update_at    DateTime  @updatedAt @default(now())
-  categoryID   Int       
+  categoryID   Int       @default(0)    
   category     Category? @relation(fields: [categoryID], references: [categoryID])
   
 }

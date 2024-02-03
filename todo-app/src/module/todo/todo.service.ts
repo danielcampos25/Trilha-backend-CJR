@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { TaskDTO } from './dto/TaskDTO';
 import { PrismaService } from 'src/database/PrismaService';
 import { CategoryDTO } from './dto/CategoryDTO';
@@ -21,43 +21,63 @@ export class TodoService {
     return this.prisma.task.findMany()
   }
 
-  async update(id: string, data: TaskDTO){
+  async update(id: string, data: TaskDTO) {  //Dando problema 
     const taskExists = await this.prisma.task.findUnique({
-      where: {
-        id,
-      }
-    })
-    if (!taskExists){
-      throw new Error ('Essa tarefa não existe');
-    }
-    await this.prisma.task.update({
-      data,
-      where:{id,}
-    })
-  }
+        where: {
+            id,
+        },
+    });
 
-  async findOne(id: string) {
-    return this.prisma.task.findUnique({
+    if (!taskExists) {
+        throw new Error('Essa tarefa não existe');
+    }
+
+    try {
+        // Check if data.name is defined before updating
+        if (data.name !== undefined) {
+            await this.prisma.task.update({
+                data: {
+                    name: data.name,
+                    // Add other fields as needed
+                },
+                where: {
+                    id,
+                },
+            });
+        }
+    } catch (error) {
+        console.error('Error updating task:', error);
+        throw new Error('Failed to update task');
+    }
+}
+
+  async findOne(id: string) {   //OK
+    const task = this.prisma.task.findUnique({
       where: { id },
     });
+    if (!task){
+      throw new NotFoundException('Está tarefa não existe')
+    }
+    return task
   }
 
-  async remove(id: string) {
+  async remove(id: string) { //OK
     return this.prisma.task.delete({
-      where: { id },
+      where: { id},
     });
   }
   
-  async filterByDone(done: boolean) {
+  async filterByDone(done: boolean) {  //dando problema "Não retorna nada"
     return this.prisma.task.findMany({
       where: {
-        done,
+        done:done,
       },
     });
   }
 
-  async filterbyCategory(categoryID: number) {
+  async filterbyCategory(categoryID: number) {  //Tbm não retorna nada
     return this.prisma.task.findMany({
+      
       where: {
         categoryID: categoryID,
       },
@@ -83,6 +103,15 @@ export class TodoService {
         categoryID: categoryID,
       },
     });
+  }
+
+  async deleteDone(){
+    return this.prisma.task.deleteMany({
+      where: {done:true}
+    });
+  }
+  async deleteAllTasks() {
+    return this.prisma.task.deleteMany();
   }
 
   

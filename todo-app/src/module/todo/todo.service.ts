@@ -21,7 +21,7 @@ export class TodoService {
     return this.prisma.task.findMany()
   }
 
-  async update(id: string, data: TaskDTO) {  //Ok
+  async update(id: string, data: TaskDTO) {  //Pode editar tanto a tarefa quanto a categoria
     const taskExists = await this.prisma.task.findUnique({
         where: {
             id,
@@ -38,6 +38,7 @@ export class TodoService {
             await this.prisma.task.update({
                 data: {
                     name: data.name,
+                    categoryID:data.categoryID
                     
                 },
                 where: {
@@ -62,14 +63,17 @@ export class TodoService {
   }
 
   async remove(id: string) {
-    // Check if the task exists
+    if (id.toLowerCase() === 'limpartudo') {
+      await this.deleteAllTasks();
+      return { message: 'Todas as tarefas foram deletadas com sucesso.' };
+    }
+  
     const existingTask = await this.prisma.task.findUnique({ where: { id } });
   
     if (!existingTask) {
       throw new Error(`Task with ID ${id} not found`);
     }
   
-    // If the task exists, proceed with deletion
     return this.prisma.task.delete({ where: { id } });
   }
   

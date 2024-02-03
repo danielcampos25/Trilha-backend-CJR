@@ -37,11 +37,7 @@ async deleteDone(@Query('done') done: boolean) {
   return this.todoService.deleteDone();
 }
 
-  @Delete('limpar-tudo')
-  async deleteAllTasks() {
-    await this.todoService.deleteAllTasks();
-    return { message: 'Todas as tarefas foram deletadas com sucesso.' };
-  }
+ 
 
   @Get('feito')
 async filterByDone(@Query('done') done: boolean) {

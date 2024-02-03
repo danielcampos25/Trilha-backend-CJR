@@ -21,7 +21,7 @@ export class TodoService {
     return this.prisma.task.findMany()
   }
 
-  async update(id: string, data: TaskDTO) {  //Dando problema 
+  async update(id: string, data: TaskDTO) {  //Ok
     const taskExists = await this.prisma.task.findUnique({
         where: {
             id,
@@ -33,12 +33,12 @@ export class TodoService {
     }
 
     try {
-        // Check if data.name is defined before updating
+        
         if (data.name !== undefined) {
             await this.prisma.task.update({
                 data: {
                     name: data.name,
-                    // Add other fields as needed
+                    
                 },
                 where: {
                     id,
@@ -61,10 +61,16 @@ export class TodoService {
     return task
   }
 
-  async remove(id: string) { //OK
-    return this.prisma.task.delete({
-      where: { id},
-    });
+  async remove(id: string) {
+    // Check if the task exists
+    const existingTask = await this.prisma.task.findUnique({ where: { id } });
+  
+    if (!existingTask) {
+      throw new Error(`Task with ID ${id} not found`);
+    }
+  
+    // If the task exists, proceed with deletion
+    return this.prisma.task.delete({ where: { id } });
   }
   
   async filterByDone(done: boolean) {  //dando problema "Não retorna nada"
@@ -111,9 +117,14 @@ export class TodoService {
     });
   }
   async deleteAllTasks() {
-    return this.prisma.task.deleteMany();
+    try {
+      const result = await this.prisma.task.deleteMany();
+      return { message: `Successfully deleted ${result.count} tasks.` };
+    } catch (error) {
+      console.error('Error deleting tasks:', error);
+      throw new Error('Failed to delete tasks.');
+    }
   }
-
   
 
 }

@@ -17,6 +17,13 @@ export class TodoService {
     return task
   }
 
+  async createCategory(data:CategoryDTO){
+    const category = await this.prisma.category.create({
+      data,
+    })
+    return category
+  }
+
   async findAll() {
     return this.prisma.task.findMany()
   }

@@ -1,14 +1,20 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete,Put, Query } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { TaskDTO} from './dto/TaskDTO';
+import { CategoryDTO } from './dto/CategoryDTO';
 
 @Controller('todo')
 export class TodoController {
   constructor(private readonly todoService: TodoService) {}
 
-  @Post() // Obs: ao criar uma tarefa deve-se passar a id de uma categoria ja existente ??
+  @Post() // Obs: ao criar uma tarefa deve-se passar a id de uma categoria ja existente ?? Como corrigir isso (?)
   async create(@Body() data: TaskDTO) {
     return this.todoService.create(data);
+  }
+
+  @Post('novacategoria')
+  async createCategory(@Body() data:CategoryDTO){
+    return this.todoService.createCategory(data)
   }
 
   @Get('tarefas')  //Sem problemas 

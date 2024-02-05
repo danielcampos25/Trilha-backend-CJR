@@ -41,6 +41,11 @@ async update(@Param('id') id: string, @Body() data: TaskDTO) {
   async remove(@Param('id') id: string) {
     return this.todoService.remove(id);
   }
+  
+  @Delete('excluircategoria/:name')
+  async deleteCategory(@Param('name') name:string){
+    return this.todoService.deleteCategory(name)
+  }
 
   @Delete()  //Delete the done false or true tasks
 async deleteDone(@Query('done') done: boolean) {

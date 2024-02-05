@@ -87,6 +87,15 @@ export class TodoService {
   
     return this.prisma.task.delete({ where: { id } });
   }
+
+  async deleteCategory(name:string){
+    const categoryExists = await this.prisma.category.findUnique({where: {name}});
+
+    if (!categoryExists){
+      throw new Error(`Category with ID ${name} not found`)
+    }
+    return this.prisma.category.delete({where: {name}})
+  }
   
   async filterByDone(done: boolean) {  //dando problema "Não retorna nada"
     return this.prisma.task.findMany({

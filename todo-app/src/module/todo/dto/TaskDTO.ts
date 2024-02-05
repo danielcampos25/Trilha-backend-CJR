@@ -3,7 +3,7 @@ export type TaskDTO = {
     name: string
     done?: boolean
     priority?: boolean
-    categoryID: number 
+    categoryID: null
     
 
 }

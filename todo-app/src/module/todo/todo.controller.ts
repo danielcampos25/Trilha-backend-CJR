@@ -27,9 +27,19 @@ export class TodoController {
   }
 
   @Put(':id')
-async update(@Param('id') id: string, @Body() data: TaskDTO) {
+  async update(@Param('id') id: string, @Body() data: TaskDTO) {
   return this.todoService.update(id, data);
-}
+  }
+
+  @Put('foifeito/:id')  //Marca como feita
+  async markAsDone(@Param('id') id: string){
+    return this.todoService.markAsDone(id);
+  }
+
+  @Put('marcarprioridade/:id') //Obs: não é possivel marcar como prioritária uma tarefa ja feita
+  async markAsPriority(@Param('id') id:string){
+    return this.todoService.markAsPriority(id);
+  }
   
 
   @Get(':id')
@@ -48,16 +58,16 @@ async update(@Param('id') id: string, @Body() data: TaskDTO) {
   }
 
   @Delete()  //Delete the done false or true tasks
-async deleteDone(@Query('done') done: boolean) {
+  async deleteDone(@Query('done') done: boolean) {
   return this.todoService.deleteDone();
 }
 
  
 
   @Get('feito')
-async filterByDone(@Query('done') done: boolean) {
-  const tasks = this.todoService.filterByDone(done);
-  return tasks;
+  async filterByDone(@Query('done') done: boolean) {
+    const tasks = this.todoService.filterByDone(done);
+    return tasks;
 }
   
 

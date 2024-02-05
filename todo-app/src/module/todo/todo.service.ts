@@ -73,6 +73,47 @@ export class TodoService {
     return task
   }
 
+  async markAsDone(id: string) {
+    const task = await this.prisma.task.findUnique({ where: { id } });
+  
+    if (!task) {
+      throw new NotFoundException('Esta tarefa não existe');
+    }
+  
+    await this.prisma.task.update({
+      data: {
+        done: true,
+        
+      },
+      where: {
+        id,
+      },
+    });
+  }
+
+  async markAsPriority(id:string){
+    const task = await this.prisma.task.findUnique({ where: { id } });
+  
+    if (!task) {
+      throw new NotFoundException('Esta tarefa não existe');
+    }
+
+    if (task.done == true){
+      throw new Error('Esta tarefa ja foi feita!')
+    }
+
+  
+    await this.prisma.task.update({
+      data: {
+        priority: true,
+        
+      },
+      where: {
+        id,
+      },
+    });
+  }
+
   async remove(id: string) {
     if (id.toLowerCase() === 'limpartudo') {
       await this.deleteAllTasks();

@@ -21,6 +21,10 @@ export class TodoService {
     return this.prisma.task.findMany()
   }
 
+  async findallCategories(){
+    return this.prisma.category.findMany()
+  }
+
   async update(id: string, data: TaskDTO) {  //Pode editar tanto a tarefa quanto a categoria
     const taskExists = await this.prisma.task.findUnique({
         where: {

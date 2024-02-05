@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete,Put, Query } from '@n
 import { TodoService } from './todo.service';
 import { TaskDTO} from './dto/TaskDTO';
 
-@Controller('tarefa')
+@Controller('todo')
 export class TodoController {
   constructor(private readonly todoService: TodoService) {}
 
@@ -11,9 +11,13 @@ export class TodoController {
     return this.todoService.create(data);
   }
 
-  @Get()  //Sem problemas 
+  @Get('tarefas')  //Sem problemas 
   async findAll(){
     return this.todoService.findAll();
+  }
+  @Get('categorias')  //sem problemas
+  async findallCategories(){
+    return this.todoService.findallCategories();
   }
 
   @Put(':id')
@@ -46,7 +50,7 @@ async filterByDone(@Query('done') done: boolean) {
 }
   
 
-  @Get(':category')
+  @Get('filtrar/:category')
   async filterbyCategory(@Param('category') category:number){
     return this.todoService.filterbyCategory(category)
   }

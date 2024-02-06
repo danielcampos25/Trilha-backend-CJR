@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { TaskDTO } from './dto/TaskDTO';
 import { PrismaService } from 'src/database/PrismaService';
 import { CategoryDTO } from './dto/CategoryDTO';
+import { generateError, responses } from 'src/ilb/helpers';
+
 
 @Injectable()
 export class TodoService {
@@ -9,27 +11,72 @@ export class TodoService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: TaskDTO) {
-    const task = await this.prisma.task.create({
+    if (!data.name) generateError('task', 400);
+    
+    const task = await this.prisma.task.findFirst({
+      where:{name:data.name},})
+    if (task) generateError('task',409);
+
+    if (data?.categoryID) {
+      const categoryExists: CategoryDTO = await this.prisma.category.findUnique(
+        {
+          where: {
+            categoryID: data.categoryID,
+          },
+        },
+      );
+
+      if (!categoryExists) generateError('category', 404);
+    }
+    const newTask = await this.prisma.task.create({
       data,
       
       
     })
-    return task
-  }
+    
+    console.log(responses.task[201].message, data)
+    return {
+      data: newTask,
+      statusCode: 201,
+    };
+  
+}
 
   async createCategory(data:CategoryDTO){
+    if (!data.name) generateError('category', 400);
+    const categoryExists = await this.prisma.category.findUnique({
+      where: {
+        name: data.name,
+      },
+    })
+    if (categoryExists) generateError('category', 409);
+
+
     const category = await this.prisma.category.create({
       data,
     })
-    return category
+    console.log(responses.category[201].message, data);
+    return {
+    
+      data: category,
+      statusCode:201,
+    }
   }
 
   async findAll() {
-    return this.prisma.task.findMany()
+    return { 
+      
+    data: await this.prisma.task.findMany(),
+    statusCode: 200
+    }
   }
 
   async findallCategories(){
-    return this.prisma.category.findMany()
+    return{ 
+      data: await this.prisma.category.findMany(),
+      statusCode: 200
+    
+    }
   }
 
   async update(id: string, data: TaskDTO) {  //Pode editar tanto a tarefa quanto a categoria
@@ -40,13 +87,23 @@ export class TodoService {
     });
 
     if (!taskExists) {
-        throw new Error('Essa tarefa não existe');
+        generateError('task',400)
+    }
+
+    if (data?.categoryID) {
+      const categoryExists = await this.prisma.category.findUnique({
+        where: {
+          categoryID: data.categoryID,
+        },
+      });
+
+      if (!categoryExists) generateError('category', 404);
     }
 
     try {
         
         if (data.name !== undefined) {
-            await this.prisma.task.update({
+           const updatedTask = await this.prisma.task.update({
                 data: {
                     name: data.name,
                     categoryID:data.categoryID
@@ -56,6 +113,11 @@ export class TodoService {
                     id,
                 },
             });
+            console.log(responses.task[200].message, data)
+            return {
+              data: updatedTask,
+              statusCode:200
+            }
         }
     } catch (error) {
         console.error('Error updating task:', error);
@@ -67,20 +129,22 @@ export class TodoService {
     const task = this.prisma.task.findUnique({
       where: { id },
     });
-    if (!task){
-      throw new NotFoundException('Está tarefa não existe')
-    }
+    if (!task){generateError('task', 404)};
+    
+    console.log(responses.task[200].message)
+    
     return task
+      
+    
   }
+  
 
   async markAsDone(id: string) {
     const task = await this.prisma.task.findUnique({ where: { id } });
   
-    if (!task) {
-      throw new NotFoundException('Esta tarefa não existe');
-    }
+    if (!task){generateError('task', 404)};
   
-    await this.prisma.task.update({
+    const updatedTask = await this.prisma.task.update({
       data: {
         done: true,
         
@@ -89,21 +153,27 @@ export class TodoService {
         id,
       },
     });
+
+    console.log(responses.task[200].message)
+    return{
+      data: updatedTask,
+      statusCode: 200
+
+    }
+
   }
 
   async markAsPriority(id:string){
     const task = await this.prisma.task.findUnique({ where: { id } });
   
-    if (!task) {
-      throw new NotFoundException('Esta tarefa não existe');
-    }
+    if (!task){generateError('task', 404)};
 
     if (task.done == true){
       throw new Error('Esta tarefa ja foi feita!')
     }
 
   
-    await this.prisma.task.update({
+    const updatedTask = await this.prisma.task.update({
       data: {
         priority: true,
         
@@ -112,20 +182,27 @@ export class TodoService {
         id,
       },
     });
+
+    console.log(responses.task[200].message)
+    return{
+      data: updatedTask,
+      statusCode:200
+    }
+    
   }
 
   async remove(id: string) {
     if (id.toLowerCase() === 'limpartudo') {
       await this.deleteAllTasks();
+      console.log(responses.task[200].message)
       return { message: 'Todas as tarefas foram deletadas com sucesso.' };
     }
   
     const existingTask = await this.prisma.task.findUnique({ where: { id } });
   
-    if (!existingTask) {
-      throw new Error(`Task with ID ${id} not found`);
-    }
+    if (!existingTask){generateError('task', 404)};
   
+    console.log(responses.task[200].message)
     return this.prisma.task.delete({ where: { id } });
   }
 

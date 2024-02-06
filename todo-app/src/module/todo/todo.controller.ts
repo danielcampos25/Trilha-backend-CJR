@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete,Put, Query } from '@n
 import { TodoService } from './todo.service';
 import { TaskDTO} from './dto/TaskDTO';
 import { CategoryDTO } from './dto/CategoryDTO';
+//import { ApiOperation, ApiResponse, ApiTags } from '@n';
 
 @Controller('todo')
 export class TodoController {
@@ -42,7 +43,7 @@ export class TodoController {
   }
   
 
-  @Get(':id')
+  @Get(':id') // OK
   async findOne(@Param('id') id: string) {
     return this.todoService.findOne(id);
   }

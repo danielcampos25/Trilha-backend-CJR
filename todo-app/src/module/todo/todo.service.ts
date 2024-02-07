@@ -283,6 +283,15 @@ export class TodoService {
       throw new Error('Failed to delete tasks.');
     }
   }
+
+  async showPriorities(){
+
+    const priorities = await this.prisma.task.findMany({
+      where: {priority:true}
+    })
+
+    return priorities
+  }
   
 
 }

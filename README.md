@@ -24,4 +24,4 @@ categoria já existente
 Categorias:
 1) Criar uma nova categoria passando o seu respectivo nome
 2) Deletar uma categoria especificando o seu nome
-3) Deletar todas as categorias (?)
+

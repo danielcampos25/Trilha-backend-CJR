@@ -139,6 +139,11 @@ async filterActive() {
   return tasks;
 }
 
+
+@Get('prioridades')
+async showPriorities(){
+  return this.todoService.showPriorities();
+}
   
 
   

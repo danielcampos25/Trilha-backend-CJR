@@ -1,4 +1,0 @@
-Projeto Backend CJR: To do List
-framework: Typescript Backend
-Nest JS
-Prisma ORM

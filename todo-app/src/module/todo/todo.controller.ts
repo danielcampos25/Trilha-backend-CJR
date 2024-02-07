@@ -66,15 +66,7 @@ export class TodoController {
 
 
 
-  @ApiOperation({ summary: 'Updates the "done" status of the task specified by id' })
-  @ApiResponse({ status: 200, description: responses.task[200].message })
-  @ApiResponse({ status: 400, description: responses.task[400].error })
-  @ApiResponse({
-    status: 404,
-    description:
-      responses.task[404].error + ' or ' + responses.category[404].error,
-  })
-  
+ 
   
   @ApiOperation({ summary: 'Updates the "done" status to true of the task specified by its id' })
   @ApiResponse({ status: 200, description: responses.task[200].message })
@@ -141,7 +133,7 @@ export class TodoController {
  
  
 
-@Get('active')
+@Get('active')  //Not working yet
 async filterActive() {
   const tasks = await this.todoService.filterActive();
   return tasks;

@@ -3,6 +3,7 @@ import { TaskDTO } from './dto/TaskDTO';
 import { PrismaService } from 'src/database/PrismaService';
 import { CategoryDTO } from './dto/CategoryDTO';
 import { generateError, responses } from 'src/ilb/helpers';
+import { doesNotMatch } from 'assert';
 
 
 @Injectable()
@@ -197,6 +198,11 @@ export class TodoService {
       console.log(responses.task[200].message)
       return { message: 'Todas as tarefas foram deletadas com sucesso.' };
     }
+    if (id.toLowerCase() === 'limparfeitas') {
+      await this.deleteDone();
+      console.log(responses.task[200].message)
+      return { message: 'Todas as tarefas feitas foram deletadas com sucesso.' };
+    }
   
     const existingTask = await this.prisma.task.findUnique({ where: { id } });
   
@@ -215,21 +221,31 @@ export class TodoService {
     return this.prisma.category.delete({where: {name}})
   }
   
-  async filterByDone(done: boolean) {  //dando problema "Não retorna nada"
-    return this.prisma.task.findMany({
+  async filterActive() {  //dando problema "Não retorna nada"
+      const tasks = await this.prisma.task.findMany({
       where: {
-        done:done,
+        done: false,
       },
     });
+    return tasks
   }
 
-  async filterbyCategory(categoryID: number) {  //Tbm não retorna nada
-    return this.prisma.task.findMany({
+  async filterbyCategory(name:string) { 
+    const category = await this.prisma.category.findUnique({
       
       where: {
-        categoryID: categoryID,
+       name : name,
       },
     });
+
+    if (!category) {generateError('category', 404)};
+
+    const activities = await this.prisma.task.findMany({
+      where: { 
+        categoryID : category.categoryID
+      }
+    })
+    return activities
   }
 
   async updateCategory(id: string, categoryID: number) {

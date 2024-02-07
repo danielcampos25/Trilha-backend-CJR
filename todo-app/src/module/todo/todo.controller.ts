@@ -40,6 +40,10 @@ export class TodoController {
   async findAll(){
     return this.todoService.findAll();
   }
+  
+  
+  @ApiOperation({ summary: 'Shows all categories' })
+  @ApiResponse({ status: 200, description: responses.category[200].message })
   @Get('categorias')  //sem problemas
   async findallCategories(){
     return this.todoService.findallCategories();
@@ -70,13 +74,25 @@ export class TodoController {
     description:
       responses.task[404].error + ' or ' + responses.category[404].error,
   })
-  @Put('foifeito/:id')  //Marca como feita
+  
+  
+  @ApiOperation({ summary: 'Updates the "done" status to true of the task specified by its id' })
+  @ApiResponse({ status: 200, description: responses.task[200].message })
+  @ApiResponse({ status: 400, description: responses.task[400].error })
+  @ApiResponse({
+    status: 404,
+    description:
+      responses.task[404].error + ' or ' + responses.category[404].error,
+  })
+  @Put('foifeito/:id')  
   async markAsDone(@Param('id') id: string){
     return this.todoService.markAsDone(id);
   }
 
 
-  @ApiOperation({ summary: 'Updates the "priority" status of the task specified by id' })
+
+  
+  @ApiOperation({ summary: 'Updates the "priority" status to true of the task specified by its id' })
   @ApiResponse({ status: 200, description: responses.task[200].message })
   @ApiResponse({ status: 400, description: responses.task[400].error })
   @ApiResponse({
@@ -102,7 +118,7 @@ export class TodoController {
 
 
 
-  @ApiOperation({ summary: 'Deletes a task specified by id or all tasks if passed "limpartudo"' })
+  @ApiOperation({ summary: 'Deletes a task specified by id or all tasks if passed "limpartudo" or all done tasks if "limparfeitas"' })
   @ApiResponse({ status: 200, description: responses.task[200].message })
   @ApiResponse({ status: 400, description: responses.task[400].error })
   @ApiResponse({ status: 404, description: responses.task[404].error })
@@ -122,22 +138,24 @@ export class TodoController {
     return this.todoService.deleteCategory(name)
   }
 
-  @Delete()  //Delete the done false or true tasks
-  async deleteDone(@Query('done') done: boolean) {
-  return this.todoService.deleteDone();
-}
-
+ 
  
 
-  @Get('feito')
-  async filterByDone(@Query('done') done: boolean) {
-    const tasks = this.todoService.filterByDone(done);
-    return tasks;
+@Get('active')
+async filterActive() {
+  const tasks = await this.todoService.filterActive();
+  return tasks;
 }
+
   
 
+  
+  @ApiOperation({ summary: 'Shows the tasks specified by the name of the category' })
+  @ApiResponse({ status: 200, description: responses.task[200].message })
+  @ApiResponse({ status: 400, description: responses.task[400].error })
+  @ApiResponse({ status: 404, description: responses.category[404].error })
   @Get('filtrar/:category')
-  async filterbyCategory(@Param('category') category:number){
+  async filterbyCategory(@Param('category') category:string){
     return this.todoService.filterbyCategory(category)
   }
 }

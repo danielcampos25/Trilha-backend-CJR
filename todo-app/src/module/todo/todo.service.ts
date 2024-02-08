@@ -126,7 +126,7 @@ export class TodoService {
     }
 }
 
-  async findOne(id: string) {   //OK
+  async findOne(id: string) {   
     const task = this.prisma.task.findUnique({
       where: { id },
     });
@@ -284,14 +284,13 @@ export class TodoService {
     }
   }
 
-  async showPriorities(){
+  async showPriorities() {
+    const data = await this.prisma.task.findMany({
+        where: { priority: true }
+    });
 
-    const priorities = await this.prisma.task.findMany({
-      where: {priority:true}
-    })
-
-    return priorities
-  }
+    return { data };
+}
   
 
 }

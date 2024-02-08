@@ -143,6 +143,7 @@ async filterActive() {
 @Get('prioridades')
 async showPriorities(){
   return this.todoService.showPriorities();
+  
 }
   
 
